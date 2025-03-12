@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Image Generator ✨</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body class="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-2xl p-8">
+            <h1 class="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                ✨ Magic Image Generator
+            </h1>
+            
+            <div class="mb-6">
+                <textarea 
+                    id="prompt" 
+                    class="w-full p-4 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500"
+                    rows="3" 
+                    placeholder="Describe your imagination... 🌈"></textarea>
+            </div>
+            
+            <button 
+                onclick="generateImage()" 
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+                id="generateBtn">
+                Create Magic 🎨
+            </button>
+            
+            <div class="mt-8" id="result">
+                <div class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden shadow-lg">
+                    <img id="outputImage" class="object-cover w-full h-full">
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center text-gray-600" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        async function generateImage() {
+            const prompt = document.getElementById('prompt').value;
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            
+            if (!prompt) return;
+            
+            btn.disabled = true;
+            status.textContent = '✨ Painting your imagination... (15-20 seconds)';
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: prompt})
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const imgUrl = URL.createObjectURL(blob);
+                    document.getElementById('outputImage').src = imgUrl;
+                    status.textContent = '🎉 Your masterpiece is ready!';
+                } else {
+                    status.textContent = '❌ Magic failed! Try different words.';
+                }
+            } catch (error) {
+                status.textContent = '⚠️ Spell interrupted! Check connection.';
+            }
+            
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
